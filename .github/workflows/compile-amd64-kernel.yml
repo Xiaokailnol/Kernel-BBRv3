@@ -101,6 +101,10 @@ jobs:
       - name: Prepare .config and disable certificate checking
         id: config
         working-directory: /builder/linux
+        env:
+          git_name: zhao
+          git_password: ${{ secrets.ftp_password }}
+          private_url: ${{ secrets.private_url }}
         if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
         run: | 
           curl -u zhao:$git_password -sO "$private_url" .config
