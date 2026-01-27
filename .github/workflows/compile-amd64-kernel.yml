@@ -102,12 +102,12 @@ jobs:
         id: config
         working-directory: /builder/linux
         env:
-          git_name: zhao
-          git_password: ${{ secrets.ftp_password }}
-          private_amd64_url: ${{ secrets.private_url }}
+          git_name: ${{ secrets.git_name }}
+          git_password: ${{ secrets.git_password }}
+          private_amd64_url: ${{ secrets.private_amd64_url }}
         if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
         run: | 
-          curl -u $git_name:$git_password -sO "$private_amd64_url" .config
+          curl -u "$git_name:$git_password" -s -o .config "$private_amd64_url"
           scripts/config --disable SYSTEM_TRUSTED_KEYS
           scripts/config --disable SYSTEM_REVOCATION_KEYS
           make olddefconfig
