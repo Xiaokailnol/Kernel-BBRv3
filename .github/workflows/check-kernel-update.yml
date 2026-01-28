@@ -1,0 +1,80 @@
+name: Check Kernel Update
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # 每 6 小时检查一次
+  workflow_dispatch:        # 手动触发
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    outputs:
+      need_build: ${{ steps.compare.outputs.need_build }}
+      new_version: ${{ steps.compare.outputs.new_version }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get latest kernel version from kernel.org
+        id: latest
+        run: |
+          latest=$(curl -s https://www.kernel.org \
+            | grep -A1 -m1 "stable:" \
+            | grep -oP '\d+\.\d+\.\d+')
+          echo "latest=$latest" >> $GITHUB_OUTPUT
+
+      - name: Read current repo kernel version (or create if missing)
+        id: current
+        run: |
+          if [ -f kernel-version.txt ]; then
+            current=$(cat kernel-version.txt)
+          else
+            current=""
+          fi
+          echo "current=$current" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        id: compare
+        run: |
+          latest="${{ steps.latest.outputs.latest }}"
+          current="${{ steps.current.outputs.current }}"
+
+          echo "Repo version:    $current"
+          echo "Remote version:  $latest"
+
+          if [ "$latest" != "$current" ]; then
+            echo "need_build=true" >> $GITHUB_OUTPUT
+            echo "new_version=$latest" >> $GITHUB_OUTPUT
+          else
+            echo "need_build=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update kernel version file
+        if: steps.compare.outputs.need_build == 'true'
+        run: |
+          echo "${{ steps.compare.outputs.new_version }}" > kernel-version.txt
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add kernel-version.txt
+          git commit -m "kernel: bump to ${{ steps.compare.outputs.new_version }}"
+          git push
+
+  trigger-build:
+    needs: check
+    if: needs.check.outputs.need_build == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger ARM64 build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: compile-arm64-kernel.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger AMD64 build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: compile-amd64-kernel.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
