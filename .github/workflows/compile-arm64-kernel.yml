@@ -136,7 +136,7 @@ jobs:
             cp -a linux-*.deb rom/
             cp -a linux-*.buildinfo rom/
             cp -a linux-*.changes rom/
-            cd rom && tar -czvf ${{ env.KERNEL_VERSION }}.tar.gz .
+            tar -czvf ${{ env.KERNEL_VERSION }}.tar.gz rom
             echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Kernel to Release
@@ -144,7 +144,7 @@ jobs:
         if: ${{ steps.prepare.outputs.status == 'success' && !cancelled() }}
         with:
           tag: kernel_arm64_stable
-          artifacts: /builder/rom/${{ env.KERNEL_VERSION }}.tar.gz
+          artifacts: /builder/${{ env.KERNEL_VERSION }}.tar.gz
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
