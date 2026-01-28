@@ -28,8 +28,8 @@ jobs:
       - name: Read current repo kernel version (or create if missing)
         id: current
         run: |
-          if [ -f kernel-version.txt ]; then
-            current=$(cat kernel-version.txt)
+          if [ -f kernel-version ]; then
+            current=$(cat kernel-version)
           else
             current=""
           fi
@@ -54,10 +54,10 @@ jobs:
       - name: Update kernel version file
         if: steps.compare.outputs.need_build == 'true'
         run: |
-          echo "${{ steps.compare.outputs.new_version }}" > kernel-version.txt
+          echo "${{ steps.compare.outputs.new_version }}" > kernel-version
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add kernel-version.txt
+          git add kernel-version
           git commit -m "kernel: bump to ${{ steps.compare.outputs.new_version }}"
           git push
 
