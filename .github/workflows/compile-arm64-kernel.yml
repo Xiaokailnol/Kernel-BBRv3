@@ -110,7 +110,7 @@ jobs:
         env:
           git_name: ${{ secrets.git_name }}
           git_password: ${{ secrets.git_password }}
-          private_amd64_url: ${{ secrets.private_arm64_url }}
+          private_arm64_url: ${{ secrets.private_arm64_url }}
         if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
         run: | 
           curl -u "$git_name:$git_password" -s -o .config "$private_arm64_url"
