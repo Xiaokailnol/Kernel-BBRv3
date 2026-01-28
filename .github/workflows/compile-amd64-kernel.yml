@@ -64,7 +64,8 @@ jobs:
         if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
         run: |
           df -hT ${PWD}
-          echo "KERNEL_VERSION=$(curl -s https://www.kernel.org | grep -A1 -m1 'stable:' | grep -oP '\d+\.\d+\.\d+')" >> $GITHUB_ENV
+          export version=$(curl -s https://www.kernel.org | grep -A1 -m1 "stable:" | grep -oP '\d+\.\d+\.\d+')
+          echo "KERNEL_VERSION=$version" >> $GITHUB_ENV
           export branch=$(echo "${{ env.KERNEL_VERSION }}" | grep -oP '^\d+\.\d+')
           git clone --depth=1 --branch linux-$branch.y https://github.com/gregkh/linux.git linux
           echo "status=success" >> ${GITHUB_OUTPUT}
