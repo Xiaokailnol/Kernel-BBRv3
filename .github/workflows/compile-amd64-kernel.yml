@@ -136,7 +136,7 @@ jobs:
             cp -a linux-*.deb rom/
             cp -a linux-*.buildinfo rom/
             cp -a linux-*.changes rom/
-            tar -czvf "$KERNEL_VERSION.tar.gz" rom
+            tar -czvf ${{ env.KERNEL_VERSION }}.tar.gz rom
             echo "status=success" >> ${GITHUB_OUTPUT}
       
       - name: Upload Kernel to Release
