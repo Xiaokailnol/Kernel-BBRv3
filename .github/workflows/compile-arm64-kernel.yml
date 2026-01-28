@@ -1,4 +1,4 @@
-name: Compile AMD64 Kernel
+name: Compile ARM64 Kernel
 
 on:
   repository_dispatch:
