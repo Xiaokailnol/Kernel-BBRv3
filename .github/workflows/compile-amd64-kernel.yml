@@ -130,11 +130,13 @@ jobs:
 
       - name: Prepare Firmware Files
         id: prepare
-        working-directory: /builder/linux
+        working-directory: /builder
         if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
         run: |
             mkdir -p rom
             cp -a linux-*.deb rom/
+            cp -a linux-*.buildinfo rom/
+            cp -a linux-*.changes rom/
             cd rom && tar -czvf ${{ env.KERNEL_VERSION }}.tar.gz .
             echo "status=success" >> ${GITHUB_OUTPUT}
       
@@ -143,7 +145,7 @@ jobs:
         if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
         with:
           tag: kernel_amd64_stable
-          artifacts: /builder/linux/rom/${{ env.KERNEL_VERSION }}.tar.gz
+          artifacts: /builder/rom/${{ env.KERNEL_VERSION }}.tar.gz
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
