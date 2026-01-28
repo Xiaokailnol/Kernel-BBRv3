@@ -71,10 +71,10 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: compile-arm64-kernel.yml
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Trigger AMD64 build
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: compile-amd64-kernel.yml
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
